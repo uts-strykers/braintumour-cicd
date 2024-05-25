@@ -2,7 +2,7 @@ name: ClearML ML Model CI/CD Pipeline
 
 on:
   pull_request:
-    branches: [master]
+    branches: [main]
     types: [assigned, opened, edited, reopened, synchronize]
 
 jobs:
