@@ -19,13 +19,14 @@ def train_model(task):
 
     if torch.cuda.is_available():
         device = torch.device('cuda')
-        print("Using CUDA")
+    
+    #    print("Using CUDA")
     elif torch.backends.mps.is_available():
         device = torch.device('mps')
-        print("Using MPS")
+    #    print("Using MPS")
     else:
         device = torch.device('cpu')
-        print("Using CPU")
+    #    print("Using CPU")
 
     # Load a model
     model = YOLO('yolov8n.pt')  # load a pretrained model (recommended for training)
@@ -51,7 +52,7 @@ def train_model(task):
     output_model.publish()
     # Log the model ID
     model_id = output_model.id
-    print(f"Task Id: {task.id} Trained model ID: {model_id}")
+    #print(f"Task Id: {task.id} Trained model ID: {model_id}")
     if os.path.exists(f"{model_file_path}"):
         os.remove(f"{model_file_path}")
 
