@@ -10,7 +10,8 @@ from clearml import Dataset, Task, OutputModel, TaskTypes
 import torch
 
 def train_model(task):
-   
+    epochs = 2
+    results_dir = "/Users/soterojrsaberon/BlastAsia/braintumour-ml/brainscan2/models"
     #task: Task = Task.init(
     #    project_name=project_name,
     #    task_name=task_name)
