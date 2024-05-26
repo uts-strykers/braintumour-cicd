@@ -1,6 +1,6 @@
 import argparse
 from clearml import Task
-from train_model import train_and_evaluate
+from train_model import train_model
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Launch a ClearML task for training a model.")
@@ -17,5 +17,5 @@ if __name__ == "__main__":
     print(f"TASK_ID_OUTPUT: {task.id}")
     task.set_repo(repo=args.repo_url, branch=args.branch_name, commit=args.commit_hash)
     task.execute_remotely(queue_name="uts-strykers-queue", exit_process=True)
-    train_and_evaluate(task)
+    train_model(task)
     
