@@ -19,5 +19,6 @@ def check_task_status(task_id, timeout=3600):  # Adjust timeout as needed
 
 
 if __name__ == "__main__":
+    print(len(sys.argv))
     task_id = sys.argv[1]  # Pass the task ID as an argument
     check_task_status(task_id)
