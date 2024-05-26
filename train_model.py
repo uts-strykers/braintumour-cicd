@@ -9,12 +9,12 @@ from ultralytics import YOLO
 from clearml import Dataset, Task, OutputModel, TaskTypes
 import torch
 
-def train_model( project_name, task_name,  epochs, args=None):
+def train_model(task):
    
-    task: Task = Task.init(
-        project_name=project_name,
-        task_name=task_name)
-   
+    #task: Task = Task.init(
+    #    project_name=project_name,
+    #    task_name=task_name)
+    #
     device = torch.device('cpu')
 
     if torch.cuda.is_available():
@@ -55,10 +55,10 @@ def train_model( project_name, task_name,  epochs, args=None):
     if os.path.exists(f"{model_file_path}"):
         os.remove(f"{model_file_path}")
 
-    return task.id, model_id
+    #return task.id
 
    
-
+""" 
 if __name__ == "__main__":
     base_path = "/Users/soterojrsaberon/BlastAsia/braintumour-ml/brainscan2"
     
@@ -95,4 +95,4 @@ if __name__ == "__main__":
         args.task_name,
         args.epochs,        
         args=args
-    )
+    ) """
