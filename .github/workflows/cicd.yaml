@@ -31,7 +31,7 @@ jobs:
       - name: Launch Training Task and Capture Task ID
         id: launch_task
         run: |
-          TASK_ID=$(python launch_training_task.py "https://github.com/${{ github.repository }}" "${{ github.head_ref }}" "${{ github.event.pull_request.head.sha }}" | grep "TASK_ID_OUTPUT:" | cut -d ' ' -f 2)
+          TASK_ID=$(python launch_training_task.py --repo_url "https://github.com/${{ github.repository }}" --branch_name "${{ github.head_ref }}" --commit_hash "${{ github.event.pull_request.head.sha }}" | grep "TASK_ID_OUTPUT:" | cut -d ' ' -f 2)
           echo "TASK_ID=$TASK_ID" >> $GITHUB_ENV
           echo "Captured Task ID: $TASK_ID"
 
