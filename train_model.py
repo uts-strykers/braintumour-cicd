@@ -8,39 +8,94 @@ import tempfile
 from ultralytics import YOLO
 from clearml import Dataset, Task, OutputModel, TaskTypes
 import torch
+import yaml
 
-def train_model( project_name, task_name,  epochs, args=None):
-   
-    task: Task = Task.init(
-        project_name=project_name,
-        task_name=task_name)
-   
+def create_data_yaml():
+
+    # Define the class names and number of classes
+    class_names = ['negative', 'positive']
+    nc = len(class_names)
+
+    # Get the root directory of the script
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Define the paths for train and validation images
+    train_path = 'train/images'
+    val_path =  'valid/images'
+    test_path =  'test/images'
+
+    # Create the data dictionary
+    data = {
+        'path': os.path.join(root_dir,"mydata", "brain-tumor"),
+        'train': train_path,
+        'val': val_path,
+        'test': test_path,
+        'nc': nc,
+        'names': class_names
+    }
+
+    # Define the path to save the data.yaml file
+    yaml_path = os.path.join(root_dir, 'data.yaml')
+
+    # Save the data dictionary to a yaml file (overwrite if it exists)
+    with open(yaml_path, 'w') as yaml_file:
+        yaml.dump(data, yaml_file, default_flow_style=False)
+
+    print(f"data.yaml file has been created at: {yaml_path}")
+
+def get_path_for_saved_model():
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Create a directory for saving the model
+    save_dir = os.path.join(root_dir, 'models')
+    os.makedirs(save_dir, exist_ok=True)
+
+    # Define the path to save the model
+    save_path = os.path.join(save_dir, 'best.pt')
+    return save_path, save_dir
+
+def train_model(task, project_name="BrainScan2", task_name="TrainModel", 
+                results_dir="/Users/soterojrsaberon/BlastAsia/braintumour-ml/brainscan2/models", 
+                epochs = 2, args=None):
+    #epochs = 2
+    #results_dir = "/Users/soterojrsaberon/BlastAsia/braintumour-ml/brainscan2/models"
+    #task: Task = Task.init(
+    #    project_name=project_name,
+    #    task_name=task_name)
+    
     device = torch.device('cpu')
 
     if torch.cuda.is_available():
         device = torch.device('cuda')
-        print("Using CUDA")
+    
+    #    print("Using CUDA")
     elif torch.backends.mps.is_available():
         device = torch.device('mps')
-        print("Using MPS")
+    #    print("Using MPS")
     else:
         device = torch.device('cpu')
-        print("Using CPU")
+    #    print("Using CPU")
+
+    model_file_path, project_dir = get_path_for_saved_model()
 
     # Load a model
     model = YOLO('yolov8n.pt')  # load a pretrained model (recommended for training)
     task = Task.current_task()
     logger = task.get_logger()
+
+    create_data_yaml()
     # Train the model
-    results = model.train(data='brainscan.yaml', device=device, epochs=epochs, imgsz=640, project=results_dir, name='brain_tumor_model')
+    results = model.train(data='data.yaml', project=project_dir, device=device, epochs=epochs, imgsz=640, name='brain_tumor_model')
 
     scores = model.val()
     
     # Save the trained model weights
-    model_output_path = os.path.join(tempfile.gettempdir())
+    #model_output_path = os.path.join(tempfile.gettempdir())
 
-    model_file_path= f"{model_output_path}/best.pt"
-
+    #model_file_path= f"{model_output_path}/best.pt"
+    #model_file_path = get_path_for_saved_model()
+    
+    #root_dir = os.path.dirname(os.path.abspath(__file__))
     model.save(model_file_path)
 
     output_model = OutputModel(task=task)#, framework="PyTorch")
@@ -51,14 +106,14 @@ def train_model( project_name, task_name,  epochs, args=None):
     output_model.publish()
     # Log the model ID
     model_id = output_model.id
-    print(f"Task Id: {task.id} Trained model ID: {model_id}")
+    #print(f"Task Id: {task.id} Trained model ID: {model_id}")
     if os.path.exists(f"{model_file_path}"):
         os.remove(f"{model_file_path}")
 
-    return task.id, model_id
+    #return task.id
 
    
-
+ 
 if __name__ == "__main__":
     base_path = "/Users/soterojrsaberon/BlastAsia/braintumour-ml/brainscan2"
     
@@ -91,8 +146,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     train_model(
-        args.project_name,
-        args.task_name,
-        args.epochs,        
+        project_name=args.project_name,
+        task_name=args.task_name,
+        epochs=args.epochs,  
+        results_dir=args.results_dir,      
         args=args
-    )
+    ) 

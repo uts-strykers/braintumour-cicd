@@ -1,0 +1,8 @@
+names:
+- negative
+- positive
+nc: 2
+path: /Users/soterojrsaberon/BlastAsia/braintumour-cicd/mydata/brain-tumor
+test: test/images
+train: train/images
+val: valid/images
