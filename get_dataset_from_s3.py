@@ -81,11 +81,16 @@ def download_s3_folder(bucket_name, s3_folder, local_dir):
         # List objects within the specified folder (prefix)
         paginator = s3.get_paginator('list_objects_v2')
         pages = paginator.paginate(Bucket=bucket_name, Prefix=s3_folder)
-
+        file_count = 0
+        max_files=30
         for page in pages:
             if 'Contents' in page:
                 for obj in page['Contents']:
                     # Form the full local path
+                    #if file_count >= max_files:
+                    #    print(f"Reached the maximum limit of {max_files} files for folder: {s3_folder}")
+                    #    return
+                    
                     local_file_path = os.path.join(local_dir, os.path.relpath(obj['Key'], s3_folder))
 
                     # Ensure the local directory exists
@@ -96,7 +101,7 @@ def download_s3_folder(bucket_name, s3_folder, local_dir):
                     print(f"Downloading {obj['Key']} to {local_file_path}")
                     s3.download_file(bucket_name, obj['Key'], local_file_path)
                     print(f"Downloaded {obj['Key']} to {local_file_path}")
-
+                    file_count += 1
     except NoCredentialsError:
         print("Error: AWS credentials not found.")
     except PartialCredentialsError:
